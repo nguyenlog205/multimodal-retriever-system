@@ -12,17 +12,22 @@ The Prompt Processing module handles the first stage of the text-based pipeline:
 
 Converts input text into a standardized format by removing accents, converting to lowercase, replacing spaces with hyphens, and removing special characters. This ensures consistency for further processing.
 
-Performed within `normalize_prompt()` function.
+Performed within `./function/normalize_prompt.py` Python script.
 
 ### 2. Knowledge Graph Construction
 #### Definition and use
 This phase is to transform the user’s natural language prompt into a structured, machine-readable representation that captures entities, attributes, and semantic relationships. This structured form enables the system to reason over the input, match it to relevant multimedia content, and bridge the gap between semanteme between diferrent types of media knowledge.
+
+P/s: This approach is inspired from *Entity–Relationship Model*.
 #### Top-level approach
 1. Entiry recognition
-2. 
+2. Attitude labeling
+3. Relationship extraction
+4. Graph assembly
 
 ### 3. Semantemes Extraction
 
 ## REFERENCES
 > [1] Prompt engineering: overview and guide, https://cloud.google.com/discover/what-is-prompt-engineering?hl=vi \
-> [2] Knowledge Graph, https://www.ibm.com/think/topics/knowledge-graph
+> [2] Knowledge Graph, https://www.ibm.com/think/topics/knowledge-graph \
+> [3] PhoBERT Named Entity Reconigtion, https://github.com/Avi197/Phobert-Named-Entity-Reconigtion

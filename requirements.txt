@@ -1,2 +1,17 @@
 # --- Image processing ---
 python-magic==0.4.27
+
+
+
+
+##### =====================================
+# PROMPT PROCESSING
+##### =====================================
+
+# Graph Assembly
+vncorenlp==1.0.3
+transformers==4.55.0
+
+--extra-index-url https://download.pytorch.org/whl/cu126
+torch
+torchvision
