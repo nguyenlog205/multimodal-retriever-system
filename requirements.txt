@@ -1,4 +1,5 @@
 # --- Image processing ---
+dotenv
 python-magic==0.4.27
 
 
