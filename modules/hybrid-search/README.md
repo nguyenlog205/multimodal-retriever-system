@@ -41,6 +41,7 @@ Reciprocal Rank Fusion (RRF) is a popular and effective method for combining res
 It works by assigning a score to each document based on its rank in each result list. The core idea is that a document's position (rank) is more important than its raw score, and a document that consistently appears at a high rank across multiple lists is likely highly relevant.
 
 The RRF score for a document ($d$) is calculated using the following formula:
+
 $$\text{RRF\_score}(d) = \sum_{r \in R}{\frac{1}{k + \text{rank}_{r}{d}}}$$
 
 **Where**:
