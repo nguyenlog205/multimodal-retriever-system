@@ -1,0 +1,53 @@
+@prefix ex: <http://example.org/multimedia#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Audio a owl:Class .
+
+ex:FeatureVector a owl:Class .
+
+ex:MultimediaFile a owl:Class .
+
+ex:TextFile a owl:Class .
+
+ex:Thumbnail a owl:Class .
+
+ex:Video a owl:Class .
+
+ex:example_image_1 a ex:Image ;
+    ex:hasCaption "An example image"^^xsd:string ;
+    ex:hasFileName "image1.jpg"^^xsd:string ;
+    ex:hasFileURI "http://example.org/files/image1.jpg"^^xsd:anyURI ;
+    ex:hasFormat "JPEG"^^xsd:string ;
+    ex:hasHeight 1080 ;
+    ex:hasSizeBytes 204800 ;
+    ex:hasWidth 1920 .
+
+ex:hasCaption a owl:DatatypeProperty .
+
+ex:hasChannels a owl:DatatypeProperty .
+
+ex:hasDurationSeconds a owl:DatatypeProperty .
+
+ex:hasFeatureID a owl:DatatypeProperty .
+
+ex:hasFileName a owl:DatatypeProperty .
+
+ex:hasFileURI a owl:DatatypeProperty .
+
+ex:hasFormat a owl:DatatypeProperty .
+
+ex:hasFrameRate a owl:DatatypeProperty .
+
+ex:hasHeight a owl:DatatypeProperty .
+
+ex:hasSampleRate a owl:DatatypeProperty .
+
+ex:hasSizeBytes a owl:DatatypeProperty .
+
+ex:hasThumbURI a owl:DatatypeProperty .
+
+ex:hasWidth a owl:DatatypeProperty .
+
+ex:Image a owl:Class .
+
