@@ -1,1 +1,4 @@
 /venv
+
+/model/vncorenlp
+__pycache__

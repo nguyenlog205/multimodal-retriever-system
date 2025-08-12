@@ -1,7 +1,7 @@
 import re
 import unicodedata
 
-def normalize_prompt(text: str) -> str:
+def normalize_text(text: str) -> str:
     """
     Chuẩn hóa prompt để xử lý NLP.
     
@@ -29,5 +29,5 @@ def normalize_prompt(text: str) -> str:
     return text
 
 
-sample = "   Xin   chào   ,   tôi   là   Long   Đạt đạt "
-print(normalize_prompt(sample))
+# sample = "   Xin   chào   ,   tôi   là   Long   Đạt đạt "
+# print(normalize_prompt(sample))
