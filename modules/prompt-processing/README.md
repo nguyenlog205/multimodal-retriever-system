@@ -19,15 +19,17 @@ Standardizes the input text by:
 
 **Purpose:** Ensures uniformity before semantic embedding and attribute extraction.
 
-**Implementation:** `./function/normalize_prompt.py`
+**Implementation:** `./function/text_normalization.py`
 
-### 2. Feature Extraction
+### 2. Keyword Extraction
 Identifies explicit **metadata-like fields** from the prompt that can be used for filtering, such as:
 - **Entities:** object, person, location, event
 - **Attributes:** date, format, category, tags
 - **Keywords:** domain-specific terms
 
 These attributes are later applied as structured filters in the **attribute-based search** step of hybrid retrieval.
+
+**Implementation:** `./function/keyword_extraction.py`
 
 
 ### 3. Semantic Embedding Vector Extraction
@@ -38,33 +40,26 @@ Transforms the normalized prompt into a high-dimensional vector representation t
 
 **Purpose:** Enables **semantic search** against multimedia embeddings (video, image, text).
 
+**Implementation:** `./function/embedding_vector_extraction.py`
 
-### 4. Hybrid Search Integration
-The extracted outputs are passed to the retrieval engine in two channels:
-- **Semantic Search:** Uses embeddings for similarity scoring.
-- **Attribute-Based Filtering:** Uses extracted attributes for precise filtering.
 
-**Flow Example:**
-1. Prompt → Normalization  
-2. Prompt → Attribute Extraction → Filter query  
-3. Prompt → Embedding → Vector similarity search  
-4. Combine results (scoring fusion)
 
----
 
 ## Example Flow
 **Prompt:**  
-> "Video tôi nấu ăn ở nhà bếp, tháng 7 năm 2023"
+> "Ảnh chụp Lăng Bác vào tháng 5 năm 2023, có trời nắng và đám đông"
 
 **After Processing:**
 ```json
 {
-  "normalized_prompt": "video toi nau an o nha bep thang 7 nam 2023",
-  "attributes": {
-    "type": "video",
-    "activity": "nấu ăn",
-    "location": "nhà bếp",
-    "date": "2023-07"
+  "normalized_text": "Ảnh chụp Lăng Bác vào tháng 5 năm 2023, có trời nắng và đám đông",
+  "keywords": {
+    "type": "image",
+    "activity": "chụp Lăng Bác",
+    "location": "Lăng Bác",
+    "date": "2023-05",
+    "weather": "nắng",
+    "people": ["đám đông"]
   },
-  "embedding": [0.012, -0.543, ...]
+  "embedding_vector": [0.012, -0.543, ...]
 }

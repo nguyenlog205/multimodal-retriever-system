@@ -1,11 +1,36 @@
 import torch
 from transformers import AutoModel, AutoTokenizer
 from pyvi import ViTokenizer
+import logging
+import sys
 
-# Load the pre-trained PhoBERT model and tokenizer globally or pass them as arguments
-# Loading them once saves time if you process many texts.
-phobert_model = AutoModel.from_pretrained("vinai/phobert-base")
-phobert_tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base")
+# --- Cấu hình Logging ---
+# Thiết lập logger để ghi log ra console và file
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        # Bạn có thể thêm FileHandler nếu muốn ghi log ra file
+        # logging.FileHandler("app.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
+# -------------------------
+
+# --- Tải mô hình và tokenizer ---
+# Đảm bảo tải mô hình và tokenizer chỉ một lần duy nhất
+try:
+    logger.info("Đang tải mô hình và tokenizer PhoBERT...")
+    phobert_model = AutoModel.from_pretrained("vinai/phobert-base")
+    phobert_tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base")
+    phobert_model.eval() # Chuyển sang chế độ đánh giá để tắt dropout
+    logger.info("Đã tải mô hình và tokenizer PhoBERT thành công.")
+except Exception as e:
+    logger.error(f"Lỗi khi tải mô hình hoặc tokenizer: {e}")
+    phobert_model = None
+    phobert_tokenizer = None
+# ---------------------------------
 
 def get_phobert_sentence_embedding(text: str) -> torch.Tensor:
     """
@@ -18,37 +43,54 @@ def get_phobert_sentence_embedding(text: str) -> torch.Tensor:
         torch.Tensor: A tensor representing the sentence embedding (from the [CLS] token).
                       The shape will be [1, hidden_size], typically [1, 768].
     """
-    # Step 1: Word-segment the text using ViTokenizer
-    # PhoBERT models are trained on word-segmented Vietnamese text.
-    segmented_text = ViTokenizer.tokenize(text)
+    if phobert_model is None or phobert_tokenizer is None:
+        logger.warning("Mô hình PhoBERT chưa được tải. Không thể tạo embedding.")
+        return torch.empty(0) # Trả về tensor rỗng nếu mô hình không tồn tại
 
-    # Step 2: Tokenize the segmented text using PhoBERT's tokenizer
-    # `return_tensors="pt"` ensures the output is a PyTorch tensor.
-    # The `encode` method handles adding special tokens like [CLS] and [SEP].
-    input_ids = phobert_tokenizer.encode(segmented_text, return_tensors="pt")
+    logger.info(f"Đang tạo embedding cho văn bản: '{text}'")
 
-    # Step 3: Extract embeddings from the PhoBERT model
-    # `torch.no_grad()` disables gradient calculation, which is good practice
-    # when you're only performing inference and not training, saving memory.
-    with torch.no_grad():
-        outputs = phobert_model(input_ids)
+    try:
+        # Bước 1: Word-segment the text using ViTokenizer
+        segmented_text = ViTokenizer.tokenize(text)
+        logger.info(f"Văn bản đã được tách từ: '{segmented_text}'")
 
-    # PhoBERT (like BERT) outputs a tuple. The first element (outputs[0])
-    # is the last layer's hidden states for all tokens.
-    # Its shape is (batch_size, sequence_length, hidden_size).
-    last_hidden_states = outputs[0]
+        # Bước 2: Tokenize the segmented text using PhoBERT's tokenizer
+        input_ids = phobert_tokenizer.encode(segmented_text, return_tensors="pt")
+        
+        # Bước 3: Extract embeddings from the PhoBERT model
+        with torch.no_grad():
+            outputs = phobert_model(input_ids)
 
-    # Step 4: Extract the sentence embedding from the [CLS] token
-    # The embedding of the [CLS] token (the first token, index 0)
-    # is commonly used as the sentence representation in BERT-like models.
-    sentence_embedding = last_hidden_states[:, 0, :]
+        last_hidden_states = outputs[0]
 
-    return sentence_embedding
+        # Bước 4: Extract the sentence embedding from the [CLS] token
+        sentence_embedding = last_hidden_states[:, 0, :]
+        logger.info("Đã tạo embedding thành công.")
+        
+        return sentence_embedding
+    except Exception as e:
+        logger.error(f"Lỗi trong quá trình tạo embedding: {e}")
+        return torch.empty(0)
 
-# --- Example Usage ---
+
+# --- Ví dụ sử dụng ---
 if __name__ == "__main__":
     example_text_1 = "Chào bạn, hôm nay bạn thế nào?"
     embedding_1 = get_phobert_sentence_embedding(example_text_1)
-    print(f"Text 1: '{example_text_1}'")
-    print(f"Embedding 1 Shape: {embedding_1.shape}")
-    print(f"Embedding 1 (first 5 dimensions): {embedding_1[0, :5]}\n")
+    
+    if embedding_1.numel() > 0:
+        print(f"\nText 1: '{example_text_1}'")
+        print(f"Embedding 1 Shape: {embedding_1.shape}")
+        print(f"Embedding 1 (first 5 dimensions): {embedding_1[0, :5]}\n")
+    else:
+        print("\nKhông thể tạo embedding cho văn bản 1.")
+
+    example_text_2 = "Đây là một ví dụ khác."
+    embedding_2 = get_phobert_sentence_embedding(example_text_2)
+    
+    if embedding_2.numel() > 0:
+        print(f"\nText 2: '{example_text_2}'")
+        print(f"Embedding 2 Shape: {embedding_2.shape}")
+        print(f"Embedding 2 (first 5 dimensions): {embedding_2[0, :5]}\n")
+    else:
+        print("\nKhông thể tạo embedding cho văn bản 2.")

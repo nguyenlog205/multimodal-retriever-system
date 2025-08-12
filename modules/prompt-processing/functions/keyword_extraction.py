@@ -1,12 +1,39 @@
 import os
+import json
+import logging
 from dotenv import load_dotenv
 from google import genai
+
+# --- Cấu hình Logging ---
+# Tạo thư mục logging nếu chưa tồn tại
+log_dir = "logging"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# Thiết lập logger
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(os.path.join(log_dir, "app.log")),
+        logging.StreamHandler() # Ghi log ra console
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # Tải các biến môi trường từ file .env
 load_dotenv()
 
-# Lấy API key từ biến môi trường
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+# --- Phần xử lý API Key và khởi tạo client ---
+API_KEY = os.getenv('GEMINI_API_KEY')
+if not API_KEY:
+    logger.error("Lỗi: Không tìm thấy GEMINI_API_KEY trong biến môi trường. Vui lòng kiểm tra file .env.")
+    client = None
+else:
+    client = genai.Client(api_key=API_KEY)
+    logger.info("Đã khởi tạo client Gemini thành công.")
+
+# ----------------------------------------------
 
 template = """
   Bạn là một hệ thống trích xuất thông tin tự động, chuyên phân tích mô tả và tạo ra đối tượng JSON chứa các thuộc tính liên quan.
@@ -53,28 +80,39 @@ template = """
     "date": "2023-10",
     "weather": "nắng"
   }
-
 """
 
-def extract_keywords(text: str) -> list:
-  """
-  Extracts keywords from the input text using Google's Gemini model.
-  Args:
-    text (str): The input text from which to extract keywords.
-  Returns:
-    list: A list of extracted keywords.
-  """
+def extract_keywords(text: str) -> str:
+    """
+    Trích xuất từ khóa từ văn bản đầu vào bằng mô hình Gemini của Google.
+    Args:
+      text (str): Văn bản đầu vào.
+    Returns:
+      str: Một chuỗi JSON với các từ khóa đã trích xuất.
+    """
+    if client is None:
+        logger.warning(f"Không thể trích xuất từ khóa cho '{text}' vì Gemini client chưa được khởi tạo.")
+        return json.dumps({"error": "Gemini client is not initialized due to missing API key."})
 
-  client = genai.Client(api_key=GEMINI_API_KEY)
+    task = f'Input: {text}\nOutput:'
+    few_shot_prompt = template + task
+    logger.info(f"Đang gọi Gemini API với input: '{text}'")
 
-  task = f'Input: {text}\nOutput:'
-  
-  few_shot_prompt = template + task
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=few_shot_prompt
+        )
+        logger.info(f"Phản hồi từ Gemini API: {response.text}")
+        return response.text
+    except Exception as e:
+        logger.error(f"Lỗi khi gọi Gemini API: {e}")
+        return json.dumps({"error": str(e)})
 
-  response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=few_shot_prompt
-  )
-
-  # print("Response:", response.text)
-  return response.text
+'''
+# --- Ví dụ sử dụng ---
+if __name__ == '__main__':
+    text_input = "Video quay lại cảnh tôi đi Đà Lạt cùng gia đình vào tháng 8 năm 2024, thời tiết rất đẹp"
+    json_output = extract_keywords(text_input)
+    print(f"\nKết quả cuối cùng:\n{json_output}")
+'''
