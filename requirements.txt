@@ -1,2 +1,11 @@
 # --- Image processing ---
 python-magic==0.4.27
+
+
+
+
+##### =====================================
+# PROMPT PROCESSING
+##### =====================================
+# Translation
+google-genai==1.29.0

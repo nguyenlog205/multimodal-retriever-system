@@ -1,28 +1,70 @@
-## Prompt Processing with Natural Language Understanding
-> *The **Prompt Processing** module serves as the first stage in the query-handling pipeline. Its main goal is to transform raw user input into a structured, machine-readable representation that can be effectively passed to downstream components (retrieval)*.
+## Prompt Processing with Hybrid Search  
+> *The **Prompt Processing** module is the entry point of the retrieval pipeline. It converts raw user input into a structured and enriched representation that supports both **vector-based semantic search** and **attribute-based filtering** for hybrid search.*
+
 
 ## Overview
-The Prompt Processing module handles the first stage of the text-based pipeline:
-- Accepts a raw user prompt (typed input).
-- Preprocesses and normalizes the text for consistent handling.
-- Applies Natural Language Understanding (NLU) techniques to extract semantic meaning.
+The Prompt Processing module orchestrates three main steps:
+1. Accept raw user prompt (text input).
+2. Normalize and preprocess it for consistent handling.
+3. Extract both semantic meaning and explicit attributes to support **hybrid retrieval**.
 
-## Core Function
-### 1. Text Normalization
+## Core Functions
 
-Converts input text into a standardized format by removing accents, converting to lowercase, replacing spaces with hyphens, and removing special characters. This ensures consistency for further processing.
+### 1. Text Standardization
+Standardizes the input text by:
+- Removing accents
+- Converting to lowercase
+- Trimming extra spaces
+- Removing special characters
 
-Performed within `normalize_prompt()` function.
+**Purpose:** Ensures uniformity before semantic embedding and attribute extraction.
 
-### 2. Knowledge Graph Construction
-#### Definition and use
-This phase is to transform the user’s natural language prompt into a structured, machine-readable representation that captures entities, attributes, and semantic relationships. This structured form enables the system to reason over the input, match it to relevant multimedia content, and bridge the gap between semanteme between diferrent types of media knowledge.
-#### Top-level approach
-1. Entiry recognition
-2. 
+**Implementation:** `./function/normalize_prompt.py`
 
-### 3. Semantemes Extraction
+### 2. Feature Extraction
+Identifies explicit **metadata-like fields** from the prompt that can be used for filtering, such as:
+- **Entities:** object, person, location, event
+- **Attributes:** date, format, category, tags
+- **Keywords:** domain-specific terms
 
-## REFERENCES
-> [1] Prompt engineering: overview and guide, https://cloud.google.com/discover/what-is-prompt-engineering?hl=vi \
-> [2] Knowledge Graph, https://www.ibm.com/think/topics/knowledge-graph
+These attributes are later applied as structured filters in the **attribute-based search** step of hybrid retrieval.
+
+
+### 3. Semantic Embedding Vector Extraction
+Transforms the normalized prompt into a high-dimensional vector representation to capture:
+- Contextual meaning
+- Synonym relationships
+- Implicit intent
+
+**Purpose:** Enables **semantic search** against multimedia embeddings (video, image, text).
+
+
+### 4. Hybrid Search Integration
+The extracted outputs are passed to the retrieval engine in two channels:
+- **Semantic Search:** Uses embeddings for similarity scoring.
+- **Attribute-Based Filtering:** Uses extracted attributes for precise filtering.
+
+**Flow Example:**
+1. Prompt → Normalization  
+2. Prompt → Attribute Extraction → Filter query  
+3. Prompt → Embedding → Vector similarity search  
+4. Combine results (scoring fusion)
+
+---
+
+## Example Flow
+**Prompt:**  
+> "Video tôi nấu ăn ở nhà bếp, tháng 7 năm 2023"
+
+**After Processing:**
+```json
+{
+  "normalized_prompt": "video toi nau an o nha bep thang 7 nam 2023",
+  "attributes": {
+    "type": "video",
+    "activity": "nấu ăn",
+    "location": "nhà bếp",
+    "date": "2023-07"
+  },
+  "embedding": [0.012, -0.543, ...]
+}
