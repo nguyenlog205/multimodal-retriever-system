@@ -42,7 +42,7 @@ It works by assigning a score to each document based on its rank in each result 
 
 The RRF score for a document ($d$) is calculated using the following formula:
 
-$$\text{RRFscore}(d) = \sum_{r \in R}{\frac{1}{k + \text{rank}_{r}{d}}}$$
+$$\text{RRF}\_\text{score}(d) = \sum_{r \in R}{\frac{1}{k + \text{rank}_{r}{d}}}$$
 
 **Where**:
 - $R$ is the set of all result lists being combined.
@@ -50,3 +50,4 @@ $$\text{RRFscore}(d) = \sum_{r \in R}{\frac{1}{k + \text{rank}_{r}{d}}}$$
 - $k$ is an adjustable constant, often set to 60. This constant prevents documents with extremely high ranks from dominating the final score and ensures that documents not present in a particular list still receive a small, non-zero "score."
 
 After calculating the RRF score for all documents from all lists, the system sorts them in descending order to create a final, unified result list.
+
