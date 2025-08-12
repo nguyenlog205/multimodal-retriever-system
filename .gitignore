@@ -1,5 +1,7 @@
 /venv
 .env
 
+/logging
+
 /model/vncorenlp
 __pycache__
