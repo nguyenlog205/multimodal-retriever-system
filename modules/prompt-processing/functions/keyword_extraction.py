@@ -1,4 +1,12 @@
+import os
+from dotenv import load_dotenv
 from google import genai
+
+# Tải các biến môi trường từ file .env
+load_dotenv()
+
+# Lấy API key từ biến môi trường
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 template = """
   Bạn là một hệ thống trích xuất thông tin tự động, chuyên phân tích mô tả và tạo ra đối tượng JSON chứa các thuộc tính liên quan.
@@ -57,7 +65,7 @@ def extract_keywords(text: str) -> list:
     list: A list of extracted keywords.
   """
 
-  client = genai.Client(api_key='AIzaSyCsWZjclPxavDFcwdZEPz1HJad9u9pzdSk')
+  client = genai.Client(api_key=GEMINI_API_KEY)
 
   task = f'Input: {text}\nOutput:'
   
