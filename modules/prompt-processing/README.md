@@ -63,3 +63,4 @@ Transforms the normalized prompt into a high-dimensional vector representation t
   },
   "embedding_vector": [0.012, -0.543, ...]
 }
+```
