@@ -1,7 +1,7 @@
 # Hybrid Search module with processed input
 > This module is to perform retrieval tasks, from a processed input to conduct hybrid search, which is a combination of keyword-based search and semantic-based search. 
 
-## Top-level approach
+## General information
 ### 1. I/O
 #### Input
 This module requires the following input, which is processed and returned by **prompt-processing** module (`./modules/prompt-processing/prompt-processing.py`).
@@ -31,7 +31,19 @@ This returns a list of top-k best results (k is defaultly defined as 5). Particu
 | 5 | `/picture/203007.png` | 0.51 |
 
 ### 2. Main tasks for module
+As described, this module performs two main tasks:
+- Semantic search, relying on embedding vector.
+- Keyword search, relying on keyword
+It then calculates ultimate ranking score for each file, and sorts them in descending order to create a final, unified result list.
 
+## Top-level approach and works
+### 1. Accept processed input
+
+### 2. Semantic Search
+
+### 3. Keyword Search
+
+### 4. Ranking Calculation
 
 
 ## APPENDIX
