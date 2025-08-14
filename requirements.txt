@@ -1,5 +1,5 @@
 # --- Image processing ---
-dotenv
+dotenv # environment variables
 python-magic==0.4.27
 
 
@@ -8,5 +8,7 @@ python-magic==0.4.27
 ##### =====================================
 # PROMPT PROCESSING
 ##### =====================================
-# Translation
 google-genai==1.29.0
+
+# Image preprocessing, processing
+ultralytics ==8.3.179
